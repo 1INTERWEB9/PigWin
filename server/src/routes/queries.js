@@ -3,8 +3,10 @@ const { query } = require("../models/query");
 
 router.get("/query/:table", async (req, res) => {
   const { table } = req.params;
-  // const { sql } = req.body;
-  const sql = `SELECT * FROM ${table}`;
+  let { condition, select } = req.body;
+  if (!select) select = "*";
+  condition ? (condition = `WHERE ${condition}`) : (condition = "");
+  const sql = `SELECT ${select} FROM ${table} ${condition}`;
   if (!table) {
     res.status(418).send({ error: "We need to sql query" });
     return;
