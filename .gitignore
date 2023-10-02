@@ -1,5 +1,5 @@
 prueba/
-front/
+front
 .env
 node_modules
 pnpm-lock.yaml
