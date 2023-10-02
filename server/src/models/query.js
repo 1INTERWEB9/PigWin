@@ -1,4 +1,4 @@
-const { connection } = require("./database");
+const { connection } = require("../database");
 const query = async (sql, data) => {
   try {
     const [results] = await connection

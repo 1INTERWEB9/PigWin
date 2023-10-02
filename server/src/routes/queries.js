@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const { query } = require("../models/query");
 
-router.get("/query", async (req, res) => {
-  const { sql } = req.body;
-  if (!sql) {
+router.get("/query/:table", async (req, res) => {
+  const { table } = req.params;
+  // const { sql } = req.body;
+  const sql = `SELECT * FROM ${table}`;
+  if (!table) {
     res.status(418).send({ error: "We need to sql query" });
     return;
   }

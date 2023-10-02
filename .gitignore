@@ -1,3 +1,4 @@
-client/
+prueba/
 .env
 node_modules
+pnpm-lock.yaml
