@@ -17,6 +17,20 @@ router.get("/query/:table", async (req, res) => {
   });
 });
 
+router.get("/report/:table1/:table2", async (req, res) => {
+  const { table1, table2 } = req.params;
+  let { condition, select } = req.body;
+  const sql = `SELECT ${select} FROM ${table1},${table2} WHERE ${condition}`;
+  if (!table1 || !table2 || !condition || !select) {
+    res.status(418).send({ error: "We need more data" });
+    return;
+  }
+  let resultQuery = await query(sql);
+  res.json({
+    Query: resultQuery,
+  });
+});
+
 router.post("/query/new/:table", async (req, res) => {
   const { table } = req.params;
   const { values } = req.body;
@@ -48,6 +62,10 @@ router.put("/query/update/:table/:id", async (req, res) => {
 router.delete("/query/delete/:table/:id", async (req, res) => {
   const { table } = req.params;
   const { id } = req.params;
+  if (!table) {
+    res.status(418).send({ error: "We need a table to delete register" });
+    return;
+  }
   let resultQuery = await query(`DELETE FROM ${table} WHERE id_${table} = ?`, [
     id,
   ]);
