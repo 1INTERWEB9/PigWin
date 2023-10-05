@@ -6,7 +6,7 @@ const query = async (sql, data) => {
       .query(sql, data ? data : undefined);
     return results;
   } catch (error) {
-    console.log("Error de consulta", "\n", error.sql);
+    throw Error(error.message);
   }
 };
 

@@ -1,22 +1,29 @@
 const mysql = require("mysql2");
 require("dotenv").config();
-const connection = mysql.createConnection({
+
+const connection = mysql.createPool({
   host: process.env.HOST_DATABASE,
   user: process.env.USER_DATABASE,
   database: process.env.NAME_DATABASE,
 });
 
-connection.connect((errorConnection) => {
-  // if (errorConnection) {
-  //   console.error("Error con la conexion de la base de datos", errorConnection);
-  // }
-  // if (!errorConnection) {
-  //   console.log("Conexion exitosa con la base de datos");
-  // }
-  errorConnection
-    ? console.error("Error to database connection: ", errorConnection.code)
-    : console.log("Sucefull connection with database");
-});
+const validateConnection = () => {
+  connection.getConnection((errorConnection, connection) => {
+    if (!errorConnection) {
+      console.log("Sucefull connection with database");
+      connection.release();
+    } else {
+      console.error(
+        "Error to database connection: ",
+        errorConnection.code,
+        " \nReconnect...."
+      );
+      setTimeout(validateConnection, 5000);
+    }
+  });
+};
+
+validateConnection();
 
 module.exports = {
   connection,

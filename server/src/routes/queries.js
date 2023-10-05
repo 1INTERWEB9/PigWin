@@ -3,24 +3,25 @@ const { query } = require("../models/query");
 
 router.get("/query/:table", async (req, res) => {
   const { table } = req.params;
-  let { condition, select } = req.body;
-  if (!select) select = "*";
+  let { condition } = req.body;
   condition ? (condition = `WHERE ${condition}`) : (condition = "");
-  const sql = `SELECT ${select} FROM ${table} ${condition}`;
-  if (!table) {
-    res.status(418).send({ error: "We need to sql query" });
-    return;
+  const sql = `SELECT * FROM ${table} ${condition}`;
+  let resultQuery;
+  try {
+    resultQuery = await query(sql);
+  } catch (error) {
+    console.log("Papadios", error);
   }
-  let resultQuery = await query(sql);
+
   res.json({
     Query: resultQuery,
   });
 });
 
-router.get("/report/:table1/:table2", async (req, res) => {
+router.get("/query/:table1/:table2", async (req, res) => {
   const { table1, table2 } = req.params;
-  let { condition, select } = req.body;
-  const sql = `SELECT ${select} FROM ${table1},${table2} WHERE ${condition}`;
+  let { condition } = req.body;
+  const sql = `SELECT * FROM ${table1},${table2} WHERE ${condition}`;
   if (!table1 || !table2 || !condition || !select) {
     res.status(418).send({ error: "We need more data" });
     return;
@@ -31,7 +32,7 @@ router.get("/report/:table1/:table2", async (req, res) => {
   });
 });
 
-router.post("/query/new/:table", async (req, res) => {
+router.post("/query/:table", async (req, res) => {
   const { table } = req.params;
   const { values } = req.body;
   if (!values) {
@@ -44,7 +45,7 @@ router.post("/query/new/:table", async (req, res) => {
   });
 });
 
-router.put("/query/update/:table/:id", async (req, res) => {
+router.put("/query/:table/:id", async (req, res) => {
   const { table } = req.params;
   const { id } = req.params;
   const { data } = req.body;
@@ -59,7 +60,7 @@ router.put("/query/update/:table/:id", async (req, res) => {
   res.json({ "Update register": resultQuery?.info });
 });
 
-router.delete("/query/delete/:table/:id", async (req, res) => {
+router.delete("/query/:table/:id", async (req, res) => {
   const { table } = req.params;
   const { id } = req.params;
   if (!table) {
