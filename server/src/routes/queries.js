@@ -49,29 +49,33 @@ router.post("/query/:table", async (req, res) => {
 router.put("/query/:table/:id", async (req, res) => {
   const { table } = req.params;
   const { id } = req.params;
-  const { data } = req.body;
-  if (!data) {
-    res.status(418).send({ error: "We need information to update register" });
-    return;
+  const { value } = req.body;
+  let resultQuery;
+  try {
+    resultQuery = await query(
+      `UPDATE ${table} SET ? WHERE id_${table} = ${id}`,
+      value
+    );
+    res.send({ "Update register": resultQuery?.info });
+  } catch (error) {
+    res.status(404).send(`Error consulta \n${error.message}`);
   }
-  let resultQuery = await query(
-    `UPDATE ${table} SET ${data?.columns} WHERE id_${table} = ${id}`,
-    data?.values
-  );
-  res.json({ "Update register": resultQuery?.info });
 });
 
 router.delete("/query/:table/:id", async (req, res) => {
   const { table } = req.params;
   const { id } = req.params;
-  if (!table) {
-    res.status(418).send({ error: "We need a table to delete register" });
-    return;
+  let resultQuery;
+  try {
+    resultQuery = await query(`DELETE FROM ${table} WHERE id_${table} = ?`, [
+      id,
+    ]);
+    if (resultQuery.affectedRows === 0)
+      throw new Error(`El registro con id_${table} ${id} no existe.`);
+    res.send({ "Delete register": resultQuery?.info });
+  } catch (error) {
+    res.status(404).send(`Error consulta \n${error.message}`);
   }
-  let resultQuery = await query(`DELETE FROM ${table} WHERE id_${table} = ?`, [
-    id,
-  ]);
-  res.json({ "Delete register": resultQuery?.info });
 });
 
 module.exports = router;
