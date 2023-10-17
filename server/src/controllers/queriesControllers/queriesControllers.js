@@ -13,8 +13,18 @@ const queryGet = async (request, response) => {
       }
     }
     let sql = `SELECT * FROM ${table}`;
-    condition ? (sql = sql + " WHERE ?") : (sql = sql);
-    const resultQuery = await query(sql, condition);
+    if (condition) {
+      sql = sql + " WHERE ";
+      for (const key in condition) {
+        sql = sql + `${key} = ${condition[key]} AND `;
+        sql = sql.slice(0, sql.length - 4);
+      }
+    } else {
+      sql = sql + "";
+    }
+
+    const resultQuery = await query(sql);
+
     if (resultQuery.length > 1) {
       response.json({
         info: { count: resultQuery.length },
@@ -34,7 +44,7 @@ const queryCreateRegister = async (request, response) => {
   try {
     if (Object.keys(values).length === 0)
       throw new Error("Información insuficiente para crear el registro");
-    await paramsValidation({ values, table });
+    await paramsValidation({ table, values });
     const resultQuery = await query(`INSERT INTO ${table} SET ?`, values);
     response.json({
       info: `Registro creado exitosamente con el id: ${resultQuery?.insertId}`,
