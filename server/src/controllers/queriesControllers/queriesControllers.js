@@ -17,8 +17,8 @@ const queryGet = async (request, response) => {
       sql = sql + " WHERE ";
       for (const key in condition) {
         sql = sql + `${key} = ${condition[key]} AND `;
-        sql = sql.slice(0, sql.length - 4);
       }
+      sql = sql.slice(0, sql.length - 4);
     } else {
       sql = sql + "";
     }
