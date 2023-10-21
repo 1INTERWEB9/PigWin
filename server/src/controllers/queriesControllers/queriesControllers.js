@@ -23,7 +23,6 @@ const queryConditionSQL = ({ sql, condition, operator, keyDate }) => {
       flag = true;
     }
   }
-  console.log(condition);
   if (flag === true)
     sql =
       sql +
