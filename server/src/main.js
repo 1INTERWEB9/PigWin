@@ -14,7 +14,7 @@ app.listen(app.get("port"), () => {
 });
 
 //Import routes
-app.use("/query", require("./routes/queriesRoutes"));
+app.use("/pigwin", require("./routes/queriesRoutes"));
 
 //If a route doesn't exist
 app.use((req, res) => {

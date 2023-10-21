@@ -1,19 +1,19 @@
 const router = require("express").Router();
 const {
-  queryGet,
-  queryCreateRegister,
-  queryUpdateRegister,
-  queryDeleteRegister,
-} = require("../controllers/queriesControllers/queriesControllers");
+  readRegister,
+  createRegister,
+  updateRegister,
+  deleteRegister,
+} = require("../handler/index");
 
-router.get("/:table", queryGet);
-router.get("/:table/:id", queryGet);
+router.get("/:table", readRegister);
+router.get("/:table/:id", readRegister);
 
-router.post("/:table", queryCreateRegister);
+router.post("/:table", createRegister);
 
-router.put("/:table/:id", queryUpdateRegister);
+router.put("/:table/:id", updateRegister);
 
-router.delete("/:table/:id", queryDeleteRegister);
+router.delete("/:table/:id", deleteRegister);
 
 router.all("*", (req, res) => {
   res.status(404).json({ Error: "Informacion inexistente o invalida" });
