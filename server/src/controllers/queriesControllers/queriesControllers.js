@@ -1,35 +1,58 @@
 const { paramsValidation } = require("./validation");
 const { query } = require("../../models/query");
 
-const queryConditionSQL = ({ sql, condition, operator }) => {
+const queryConditionSQL = ({ sql, condition, operator, keyDate }) => {
+  let flag = false;
+  let attributeCondition = [];
   let simbol = "";
-  if ((operator = "LIKE")) simbol = "%";
+  if (operator === "LIKE") simbol = "%";
   sql = sql + " WHERE ";
   for (let key in condition) {
+    if (
+      key.toLowerCase() !== "fecha inicio" &&
+      key.toLowerCase() !== "fecha final"
+    ) {
+      sql =
+        sql +
+        "`" +
+        key +
+        "`" +
+        `${operator} '${simbol}${condition[key]}${simbol}' AND `;
+    } else {
+      attributeCondition.push(key);
+      flag = true;
+    }
+  }
+  console.log(condition);
+  if (flag === true)
     sql =
       sql +
-      "`" +
-      key +
-      "`" +
-      `${operator} '${simbol}${condition[key]}${simbol}' AND `;
-  }
+      keyDate +
+      "BETWEEN '" +
+      condition[attributeCondition[0]] +
+      "' AND '" +
+      condition[attributeCondition[1]] +
+      "' AND ";
   sql = sql.slice(0, sql.length - 4);
+
   return sql;
 };
 
 const querySelectionSQL = async ({ table }) => {
   const resultQuery = await query(`SELECT * FROM ${table}`);
   let select = "";
+  let filter = "aux";
   for (let key in resultQuery[0]) {
     key = "`" + key + "`";
-    if (key.toLowerCase().includes("fecha"))
-      select = select + `,DATE_FORMAT(${key}, '%H:%i %d-%m') AS ${key}`;
-    else {
-      if (key != "`id`") select = select + `,${key}`;
+    if (key.toLowerCase().includes("fecha")) {
+      select = select + `,DATE_FORMAT(${key}, '%H:%i %m-%d') AS ${key}`;
+      filter = key;
+    } else {
+      if (key != "id") select = select + `,${key}`;
     }
   }
   select = select.slice(1, select.length);
-  return select;
+  return [select, filter];
 };
 
 const queryGet = async ({ id, condition, table }) => {
@@ -42,13 +65,15 @@ const queryGet = async ({ id, condition, table }) => {
   }
   let sql = `SELECT * FROM ${table}`;
   let operator = "=";
+
+  let keyDate;
   if (table.includes("reporte")) {
     operator = "LIKE";
-    const select = await querySelectionSQL({ table });
+    const [select, filter] = await querySelectionSQL({ table });
+    keyDate = filter;
     sql = `SELECT ${select} FROM ${table}`;
   }
-
-  if (condition) sql = queryConditionSQL({ sql, condition, operator });
+  if (condition) sql = queryConditionSQL({ sql, condition, operator, keyDate });
   const resultQuery = await query(sql);
   let results = {};
   if (resultQuery.length > 1) {

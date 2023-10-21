@@ -12,8 +12,13 @@ const paramsValidation = async ({ condition, table, values }) => {
         if (keyRegister.toLowerCase() === keyCondition.toLowerCase())
           validation++;
       }
+      if (
+        keyCondition.toLowerCase() === "fecha inicio" ||
+        keyCondition.toLowerCase() === "fecha final"
+      ) {
+        validation++;
+      }
     }
-
     if (validation !== Object.keys(condition ? condition : values).length)
       throw new Error("Hay un valor invalido");
   } catch (error) {
